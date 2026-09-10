@@ -1,0 +1,164 @@
+:root {
+  /* Brand palette */
+  --brand-ink:   #1A1A1A;
+  --brand-gray:  #8E8B85;
+  --brand-red:   #F73A52;
+  --brand-paper: #FAF7F2;
+
+  /* UI surface (light, Apple-ish) */
+  --bg:            #ECEAE6;
+  --bg-deep:       #E2DFDA;
+  --panel:         rgba(255, 255, 255, 0.72);
+  --panel-solid:   #FFFFFF;
+  --panel-border:  rgba(26, 26, 26, 0.09);
+  --hairline:      rgba(26, 26, 26, 0.07);
+  --text:          #1A1A1A;
+  --text-2:        rgba(26, 26, 26, 0.56);
+  --text-3:        rgba(26, 26, 26, 0.34);
+  --accent:        #F73A52;
+  --accent-soft:   rgba(247, 58, 82, 0.14);
+  --control:       rgba(26, 26, 26, 0.05);
+  --control-hover: rgba(26, 26, 26, 0.09);
+  --track:         rgba(26, 26, 26, 0.11);
+
+  --r-sm: 7px;
+  --r-md: 11px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+
+  --shadow-1: 0 1px 2px rgba(26,26,26,.06), 0 4px 14px rgba(26,26,26,.06);
+  --shadow-2: 0 2px 6px rgba(26,26,26,.07), 0 18px 48px rgba(26,26,26,.10);
+
+  --sidebar-w: 320px;
+  --titlebar-h: 52px;
+
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+          "Inter", "Helvetica Neue", Segoe UI, system-ui, sans-serif;
+  --mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:            #131313;
+    --bg-deep:       #0D0D0D;
+    --panel:         rgba(34, 34, 34, 0.72);
+    --panel-solid:   #1F1F1F;
+    --panel-border:  rgba(255, 255, 255, 0.09);
+    --hairline:      rgba(255, 255, 255, 0.08);
+    --text:          #F2F0EC;
+    --text-2:        rgba(242, 240, 236, 0.58);
+    --text-3:        rgba(242, 240, 236, 0.34);
+    --control:       rgba(255, 255, 255, 0.07);
+    --control-hover: rgba(255, 255, 255, 0.12);
+    --track:         rgba(255, 255, 255, 0.14);
+    --shadow-1: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.3);
+    --shadow-2: 0 2px 6px rgba(0,0,0,.45), 0 18px 48px rgba(0,0,0,.45);
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+
+/* An explicit `display` in a component rule would otherwise beat the UA sheet. */
+[hidden] { display: none !important; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+#app {
+  display: grid;
+  grid-template-rows: var(--titlebar-h) 1fr;
+  height: 100%;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr var(--sidebar-w);
+  min-height: 0;
+  gap: 0;
+}
+
+.sidebar {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 12px 64px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--track) transparent;
+}
+.sidebar--left  { border-right: 1px solid var(--hairline); }
+.sidebar--right { border-left: 1px solid var(--hairline); }
+.sidebar::-webkit-scrollbar { width: 9px; }
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--track); border-radius: 99px;
+  border: 3px solid transparent; background-clip: content-box;
+}
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+
+.stage {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(120% 90% at 50% 0%, var(--bg) 0%, var(--bg-deep) 100%);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.stage__frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 4px;
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+  transform-origin: center center;
+  background: var(--brand-paper);
+  will-change: transform;
+}
+.stage__frame canvas { display: block; }
+
+.stage__hud {
+  position: absolute;
+  left: 0; right: 0; bottom: 14px;
+  display: flex; justify-content: center; gap: 8px;
+  pointer-events: none;
+}
+.stage__hud > * { pointer-events: auto; }
+
+.toast {
+  position: fixed;
+  left: 50%; bottom: 26px;
+  transform: translate(-50%, 10px);
+  padding: 9px 16px;
+  border-radius: 99px;
+  background: var(--panel-solid);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--shadow-2);
+  font-size: 12.5px; font-weight: 500;
+  opacity: 0;
+  transition: opacity .22s ease, transform .22s cubic-bezier(.2,.8,.3,1);
+  z-index: 200;
+}
+.toast[data-show="1"] { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 1240px) {
+  :root { --sidebar-w: 286px; }
+}
