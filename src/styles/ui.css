@@ -230,6 +230,8 @@ select:focus, input[type="text"]:focus { border-color: var(--accent); }
   background: var(--accent); color: #fff; border-color: transparent;
 }
 .btn--primary:hover { background: #ff5065; }
+.btn--recording { animation: rec-pulse 1.2s ease-in-out infinite; }
+@keyframes rec-pulse { 50% { opacity: .6; } }
 .btn--ghost { background: transparent; box-shadow: none; border-color: transparent; color: var(--text-2); }
 .btn--ghost:hover { background: var(--control); color: var(--text); }
 .btn--wide { width: 100%; }

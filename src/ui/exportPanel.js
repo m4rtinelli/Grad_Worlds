@@ -4,7 +4,7 @@ import { BRAND_LIST } from '../core/palette.js';
 import { state, scheduleSave } from '../core/state.js';
 import { emit } from '../core/bus.js';
 import { activeApp } from '../core/appRegistry.js';
-import { exportStill, exportSequence, estimateSequenceBytes, formatBytes } from '../core/exporter.js';
+import { exportStill, exportSequence, estimateSequenceBytes, formatBytes, startRecording, pickVideoFormat } from '../core/exporter.js';
 import { toast } from './toast.js';
 
 export function buildCanvasPanel(host) {
@@ -138,4 +138,93 @@ export function buildExportPanel(host) {
   }
 
   hint(ex, 'Frames are rendered at exact times, so the sequence matches the preview and is reproducible.');
+
+  buildRecordPanel(host);
+}
+
+/** Real-time video capture of the live canvas (pointer interaction included). */
+function buildRecordPanel(host) {
+  const rc = panel(host, 'Record');
+  const e = state.exporter;
+  const format = pickVideoFormat();
+
+  if (!format) {
+    hint(rc, 'Video recording is not supported in this browser.');
+    return;
+  }
+
+  const status = el('p', 'hint', rc);
+  const btns = buttonRow(rc);
+  const recBtn = button(btns, `Record ${format.ext.toUpperCase()}`, toggle, 'btn btn--primary');
+
+  let rec = null;
+  let timer = null;
+  let savedQuality = null;
+
+  const idle = () => {
+    status.textContent = `Live capture · ${state.canvas.width}×${state.canvas.height} · ${e.fps} fps · ${format.ext.toUpperCase()}`;
+  };
+  idle();
+
+  async function toggle() {
+    if (rec) return stop();
+
+    const app = activeApp();
+    if (!app) return;
+
+    // Field renders the live view at preview quality; record at full size.
+    if (state.tab === 'field' && state.field.quality < 1) {
+      savedQuality = state.field.quality;
+      state.field.quality = 1;
+      emit('canvas:resize');
+    }
+
+    try {
+      rec = startRecording(app, { fps: e.fps, prefix: e.prefix });
+    } catch (err) {
+      console.error(err);
+      toast('Recording failed — see console');
+      restoreQuality();
+      return;
+    }
+
+    recBtn.textContent = 'Stop';
+    recBtn.classList.add('btn--recording');
+    timer = setInterval(() => {
+      status.textContent = `Recording… ${rec.elapsed().toFixed(1)}s`;
+    }, 100);
+  }
+
+  async function stop() {
+    clearInterval(timer);
+    timer = null;
+    recBtn.disabled = true;
+    status.textContent = 'Encoding…';
+
+    try {
+      const res = await rec.stop();
+      toast(`${res.ext.toUpperCase()} saved · ${res.seconds.toFixed(1)}s`);
+    } catch (err) {
+      console.error(err);
+      toast('Recording failed — see console');
+    } finally {
+      rec = null;
+      recBtn.disabled = false;
+      recBtn.textContent = `Record ${format.ext.toUpperCase()}`;
+      recBtn.classList.remove('btn--recording');
+      restoreQuality();
+      idle();
+    }
+  }
+
+  function restoreQuality() {
+    if (savedQuality == null) return;
+    state.field.quality = savedQuality;
+    savedQuality = null;
+    emit('canvas:resize');
+  }
+
+  hint(rc, format.ext === 'mp4'
+    ? 'Records the canvas as it plays, including pointer interaction. Encoded live as H.264 MP4.'
+    : 'Records the canvas as it plays, including pointer interaction. This browser can only encode WebM — use Chrome, Edge or Safari for MP4.');
 }
