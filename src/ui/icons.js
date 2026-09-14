@@ -8,6 +8,7 @@ export const ICONS = {
   torus: svg('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>'),
   cylinder: svg('<ellipse cx="12" cy="6.5" rx="6" ry="2.6"/><path d="M6 6.5v11c0 1.4 2.7 2.6 6 2.6s6-1.2 6-2.6v-11"/>'),
   metaballs: svg('<circle cx="8.5" cy="9" r="4.2"/><circle cx="15" cy="15" r="4.6"/>'),
+  svg: svg('<path d="M4 8l6-4 10 3v9l-6 4L4 17z"/><path d="M4 8l10 3 6-3M14 11v9"/>'),
   eye: svg('<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/>'),
   eyeOff: svg('<path d="M3 3l18 18"/><path d="M10.6 6.1A9.9 9.9 0 0112 6c6.4 0 10 6 10 6a17 17 0 01-3.3 3.9M6.3 8.2A17 17 0 002 12s3.6 6.5 10 6.5a10 10 0 003.3-.5"/>'),
   trash: svg('<path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/>'),

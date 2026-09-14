@@ -17,8 +17,15 @@ export const OBJECT_TYPES = [
   { id: 'capsule',    label: 'Capsule' },
   { id: 'torus',      label: 'Torus' },
   { id: 'cylinder',   label: 'Cylinder' },
-  { id: 'metaballs',  label: 'Metaballs' }
+  { id: 'metaballs',  label: 'Metaballs' },
+  { id: 'svg',        label: 'SVG' }
 ];
+
+/** Placeholder shape an SVG object shows until a file is loaded into it. */
+export const PLACEHOLDER_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+  '<path fill="#000" d="M50 4l13.5 30.4 33 3.4-24.8 22.2 7 32.6L50 76.2 21.3 92.6l7-32.6L3.5 37.8l33-3.4z"/>' +
+  '</svg>';
 
 /** Geometry parameters per object type. */
 export function defaultGeometry(type) {
@@ -33,6 +40,17 @@ export function defaultGeometry(type) {
       return { radius: 1, tube: 0.38, segments: 128, tubeSegments: 48 };
     case 'cylinder':
       return { radiusTop: 0.7, radiusBottom: 0.7, height: 1.6, segments: 64 };
+    case 'svg':
+      return {
+        svg: PLACEHOLDER_SVG,
+        fileName: '',
+        size: 2.4,          // largest dimension, world units
+        depth: 0.5,
+        bevelSize: 0.06,
+        bevelThickness: 0.06,
+        bevelSegments: 4,
+        curveSegments: 16
+      };
     case 'metaballs':
       return {
         resolution: 48,

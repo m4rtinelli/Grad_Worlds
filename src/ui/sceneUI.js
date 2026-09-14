@@ -11,6 +11,7 @@ import {
 } from '../core/state.js';
 import { emit } from '../core/bus.js';
 import { buildExportPanel } from './exportPanel.js';
+import { addSvgObject } from './svgImport.js';
 
 /* ------------------------------------------------------------------ */
 /* left sidebar                                                        */
@@ -33,8 +34,14 @@ export function buildSceneLeft(host) {
     tile.appendChild(icon(t.id));
     const s = el('span', null, tile);
     s.textContent = t.label;
-    tile.onclick = () => { addObject(t.id); scheduleSave(); };
+    if (t.id === 'svg') {
+      tile.title = 'Upload an SVG and extrude it';
+      tile.onclick = () => addSvgObject();
+    } else {
+      tile.onclick = () => { addObject(t.id); scheduleSave(); };
+    }
   });
+  hint(add, 'SVG loads a vector file and extrudes its filled paths into a solid.');
 
   /* layers */
   const layersHost = panel(host, 'Objects');

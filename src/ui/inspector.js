@@ -7,6 +7,7 @@ import { OSC_TARGETS, WAVE_LIST } from '../core/oscillators.js';
 import { state, changeObjectType, applyMaterialToAll, scheduleSave } from '../core/state.js';
 import { emit } from '../core/bus.js';
 import { icon } from './icons.js';
+import { pickSvgFile, loadSvgInto } from './svgImport.js';
 
 const touch = (topic) => { emit(topic); scheduleSave(); };
 
@@ -64,6 +65,17 @@ export function buildInspector(host, obj) {
         { id: 'x', label: 'X' }, { id: 'y', label: 'Y' }, { id: 'z', label: 'Z' }
       ], () => touch('scene:objects'));
       hint(g, 'Resolution drives cost — keep it low while designing, raise it before export.');
+    }
+    if (obj.type === 'svg') {
+      const src = el('div', 'file-row', g);
+      const name = el('span', 'file-row__name', src);
+      name.textContent = obj.geometry.fileName || 'Placeholder star';
+      name.title = name.textContent;
+      button(src, 'Replace SVG…', async () => {
+        const file = await pickSvgFile();
+        if (file) loadSvgInto(obj, file);
+      }, 'btn btn--sm');
+      hint(g, 'Filled paths are extruded; holes are kept. Size is the largest dimension in world units — depth and bevel are relative to it.');
     }
     gcs.forEach((c) => {
       slider(g, c.label, obj.geometry, c.key, {
